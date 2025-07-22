@@ -20,27 +20,24 @@ const ResendTimer = ({
   return (
     <View
       style={{
-        flexDirection: "row",
-        justifyContent: "center",
+        flexDirection: 'row',
+        justifyContent: 'center',
         marginTop: 20,
-        alignContent: "center",
-        alignSelf: "center",
-      }}
-    >
-      <Text style={{ color: "#000", fontSize: 14, fontWeight: "700" }}>
+        alignContent: 'center',
+        alignSelf: 'center',
+      }}>
+      <Text style={{color: '#000', fontSize: 14, fontWeight: '700'}}>
         Didn't get the code?
       </Text>
       {!resendingEmail && (
         <TouchableOpacity
           activeOpacity={0.9}
           disabled={!activeResend}
-          style={{ opacity: !activeResend && 0.5 }}
-          onPress={resendEmail}
-        >
+          style={{opacity: !activeResend && 0.5}}
+          onPress={resendEmail}>
           <Text
             resendStatus={resendStatus}
-            style={{ textDecorationLine: "underline" }}
-          >
+            style={{textDecorationLine: 'underline'}}>
             {resendStatus}
           </Text>
         </TouchableOpacity>
@@ -56,15 +53,14 @@ const ResendTimer = ({
         <View>
           <Text
             style={{
-              color: "#ccc",
+              color: '#ccc',
               fontSize: 14,
-              fontWeight: "700",
+              fontWeight: '700',
               marginLeft: 10,
               opacity: !activeResend && 0.5,
-            }}
-          >
-            Resend in{" "}
-            <Text style={{ color: COLORS.rendezvousRed }}>
+            }}>
+            Resend in{' '}
+            <Text style={{color: COLORS.vtbBtnColor}}>
               {timeLeft || targetTime}
             </Text>
           </Text>
@@ -75,12 +71,11 @@ const ResendTimer = ({
         <TouchableOpacity activeOpacity={0.9} onPress={resendEmail}>
           <Text
             style={{
-              color: COLORS.rendezvousRed,
+              color: COLORS.vtbBtnColor,
               fontSize: 14,
-              fontWeight: "700",
+              fontWeight: '700',
               marginLeft: 10,
-            }}
-          >
+            }}>
             Resend
           </Text>
         </TouchableOpacity>

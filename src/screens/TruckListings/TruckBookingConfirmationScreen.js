@@ -8,7 +8,11 @@ import HeaderTitle from '../../components/common/HeaderTitle';
 import FixedBottomContainer from '../../components/common/FixedBottomContainer';
 import FormButton from '../../components/form/FormButton';
 import axiosInstance from '../../utils/api-client';
-import {formatDateTime, RNToast} from '../../Library/Common';
+import {
+  formatDateTime,
+  parseNairaToNumber,
+  RNToast,
+} from '../../Library/Common';
 import ScrollViewSpace from '../../components/common/ScrollViewSpace';
 import VtbTruckCard2 from '../../components/cards/VtbTruckCard2';
 import DetailsOption from '../../components/common/DetailsOption';
@@ -32,7 +36,7 @@ const TruckBookingConfirmationScreen = ({navigation, route}) => {
         time: item?.appointmentTime?.time,
       },
       description: item?.description,
-      price: item?.price,
+      price: parseNairaToNumber(item?.price),
       pickupLocation: {
         address: item?.pickupLocation?.address,
         city: item?.pickupLocation?.city,
@@ -43,12 +47,12 @@ const TruckBookingConfirmationScreen = ({navigation, route}) => {
         city: item?.deliveryLocation?.city,
         country: item?.deliveryLocation?.country,
       },
-
+      driverId: item?.truckInfo?.driverId,
       status: 'request',
       reminders: [15, 60],
       negotiation: {
         proposedBy: 'user',
-        userOffer: item?.price,
+        userOffer: parseNairaToNumber(item?.price),
         status: 'proposed',
       },
     };
@@ -70,9 +74,10 @@ const TruckBookingConfirmationScreen = ({navigation, route}) => {
 
           RNToast(Toast, 'Great, your appointment has been booked');
           Alert.alert(
-            'Booking Received',
-            'Thank you for booking with us! Our team will review your request and reach out to you shortly to confirm availability and details. A confirmation email has been sent to your inbox. Please keep an eye on your notifications.',
+            'Booking Request Sent',
+            `Thank you for booking with us! ${item?.truckInfo?.matchedDriverProfile?.fullName} has been notified and will confirm your request shortly. You’ll receive a confirmation once the driver accepts the booking. Please keep an eye on your notifications.`,
           );
+
           navigation.navigate('TruckListing');
         })
         .catch(err => {
@@ -108,12 +113,12 @@ const TruckBookingConfirmationScreen = ({navigation, route}) => {
 
         <DetailsOption2
           label={'From'}
-          value={`${item?.pickupLocation?.address}. ${item?.pickupLocation?.city} state`}
+          value={`${item?.pickupLocation?.address}.`}
         />
 
         <DetailsOption2
           label={'To'}
-          value={`${item?.deliveryLocation?.address}. ${item?.deliveryLocation?.city} state`}
+          value={`${item?.deliveryLocation?.address}.`}
         />
 
         <DetailsOption2 label={'Description'} value={item?.description} />
@@ -124,7 +129,7 @@ const TruckBookingConfirmationScreen = ({navigation, route}) => {
       {/* Buttons */}
       <FixedBottomContainer top={1.19}>
         <FormButton
-          title={'Confirm Booking'}
+          title={`Pay ${item?.price}`}
           width={1.1}
           onPress={bookAppointment}
           disabled={loading}

@@ -19,31 +19,88 @@ const TruckListing = ({navigation}) => {
   console.log('userProfle', userProfle);
 
   const reduxTruckListings = state?.user?.truckListings;
+  const trucksWithDriversAssigned = reduxTruckListings?.filter(
+    trx => trx?.matchedDriverProfile,
+  );
+  console.log('trucksWithDriversAssigned', trucksWithDriversAssigned);
   console.log('reduxTruckListings', reduxTruckListings);
 
   const [loading, setLoading] = useState(false);
 
   const fetchTruckListings = async () => {
-    setLoading(true);
-
     try {
-      await axiosInstance({
-        url: 'api/listing/all-offerings',
-        method: 'GET',
-      })
-        .then(res => {
-          console.log('fetchTruckListings res', res?.data);
-          setLoading(false);
+      const truckListingResponse = await axiosInstance.get(
+        'api/listings/all-offerings',
+      );
+      let trucks = truckListingResponse?.data?.data || [];
 
-          dispatch(saveTruckListings(res?.data?.data));
-        })
-        .catch(err => {
-          console.log('fetchTruckListings err', err?.response?.data);
-          setLoading(false);
-        });
+      if (trucks) {
+        const matchedResponses = truckListingResponse?.data?.data;
+
+        const matchedResponseWithProfiles = await Promise.all(
+          matchedResponses?.map(async listing => {
+            const matchedDriverProfile = await getDriversProfile(
+              listing?.driverId,
+            );
+            const truckOwnerProfile = await getTruckOwnerProfile(
+              listing?.truckOwnerId,
+            );
+
+            return {
+              ...listing,
+              matchedDriverProfile,
+              truckOwnerProfile,
+            };
+          }),
+        );
+
+        console.log(
+          'matchedResponseWithProfiles :',
+          matchedResponseWithProfiles,
+        );
+        setLoading(false);
+        dispatch(saveTruckListings(matchedResponseWithProfiles));
+      }
     } catch (error) {
-      console.log('fetchTruckListings error', error);
       setLoading(false);
+      console.log('fetchTruckListings error', error?.response?.data || error);
+    }
+  };
+
+  const getDriversProfile = async driverId => {
+    try {
+      const response = await axiosInstance({
+        url: `api/profile/driverprofiles/${driverId}`,
+        method: 'GET',
+      });
+      console.log('getDriversProfile res', response?.data);
+      return response?.data;
+    } catch (error) {
+      console.error(
+        `getDriversProfile error for driverId ${driverId}:`,
+        error?.response,
+      );
+
+      return null;
+    }
+  };
+
+  const getTruckOwnerProfile = async truckOwnerId => {
+    console.log('truckOwnerId', truckOwnerId);
+    try {
+      const response = await axiosInstance({
+        url: `api/profile/truckprofiles/${truckOwnerId}`,
+        method: 'GET',
+      });
+      console.log('getTruckOwnerProfile res', response?.data);
+      return response?.data;
+    } catch (error) {
+      console.error(
+        `getTruckOwnerProfile error for truckOwnerId ${truckOwnerId}:`,
+        error?.response,
+      );
+
+      return null;
     }
   };
 
@@ -54,10 +111,11 @@ const TruckListing = ({navigation}) => {
 
   return (
     <SafeAreaViewComponent>
-      <HeaderTitle headerTitle={'Truck Listings'} />
+      <HeaderTitle headerTitle={'Vehicle Listings'} />
       <SearchBar searchPlaceholder={'Search trucks, vans, buses ...'} />
 
       <ScrollView
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{padding: 20}}
         refreshControl={
           <RefreshControl
@@ -67,7 +125,7 @@ const TruckListing = ({navigation}) => {
             style={{zIndex: 999}}
           />
         }>
-        {reduxTruckListings?.map((cur, i) => (
+        {trucksWithDriversAssigned?.map((cur, i) => (
           <VtbTruckCard
             key={i}
             props={cur}

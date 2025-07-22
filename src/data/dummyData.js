@@ -96,41 +96,6 @@ export const subscriptionPlans = [
 export const dummyImageUrl =
   'https://res.cloudinary.com/rendezvouscare/image/upload/v1737470744/user-dummy-img_xdpwhf.jpg';
 
-export const rendezvousRoles = [
-  {
-    label: 'Find Love',
-    value: 'User',
-  },
-  {
-    label: 'I am a Vendor',
-    value: 'Vendor',
-  },
-  {
-    label: 'I am a LifeCoach',
-    value: 'LifeCoach',
-  },
-  {
-    label: 'I am a Therapist',
-    value: 'Therapist',
-  },
-  {
-    label: 'I am a Tour Guide',
-    value: 'TourGuide',
-  },
-  {
-    label: 'I am a Car Dealer',
-    value: 'CarDealer',
-  },
-];
-
-export const therapyQuestionsOptions3 = [
-  {
-    value: 'Experience with specific issues',
-    label: 'Experience with specific issues',
-  },
-  {value: 'Flexible Scheduling', label: 'Flexible Scheduling'},
-];
-
 export const vtbTruckServices = [
   'Van Interstate',
   'Bus Interstate',
@@ -166,3 +131,6 @@ export const availableTimesForAppointmentDaily = [
   '11:00 PM',
   '12:00 AM',
 ];
+
+export const truckExtraMessage =
+  'Every vehicle booked through our platform includes a dedicated driver and trained assistant to ensure safe handling, swift loading, and timely delivery of your goods—providing a smooth, stress-free experience for both inter- and intra-state bookings.';

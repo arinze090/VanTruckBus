@@ -34,26 +34,91 @@ const HomeScreen = ({navigation}) => {
   const reduxTruckListings = state?.user?.truckListings;
   console.log('reduxTruckListings', reduxTruckListings);
 
+  const trucksWithDriversAssigned = reduxTruckListings?.filter(
+    trx => trx?.matchedDriverProfile,
+  );
+  console.log('trucksWithDriversAssigned', trucksWithDriversAssigned);
+
   const greeting = getTimeOfDayGreeting();
+  const [loading, setLoading] = useState(false);
 
   const [userLiveAddress, setUserLiveAddress] = useState();
   const [coordinates, setCoordinates] = useState();
 
   const fetchTruckListings = async () => {
     try {
-      await axiosInstance({
-        url: 'api/listings/all-offerings',
-        method: 'GET',
-      })
-        .then(res => {
-          console.log('fetchTruckListings res', res?.data);
-          dispatch(saveTruckListings(res?.data?.data));
-        })
-        .catch(err => {
-          console.log('fetchTruckListings err', err?.response?.data);
-        });
+      const truckListingResponse = await axiosInstance.get(
+        'api/listings/all-offerings',
+      );
+      let trucks = truckListingResponse?.data?.data || [];
+
+      if (trucks) {
+        const matchedResponses = truckListingResponse?.data?.data;
+
+        const matchedResponseWithProfiles = await Promise.all(
+          matchedResponses?.map(async listing => {
+            const matchedDriverProfile = await getDriversProfile(
+              listing?.driverId,
+            );
+            const truckOwnerProfile = await getTruckOwnerProfile(
+              listing?.truckOwnerId,
+            );
+
+            return {
+              ...listing,
+              matchedDriverProfile,
+              truckOwnerProfile,
+            };
+          }),
+        );
+
+        console.log(
+          'matchedResponseWithProfiles :',
+          matchedResponseWithProfiles,
+        );
+        setLoading(false);
+        dispatch(saveTruckListings(matchedResponseWithProfiles));
+      }
     } catch (error) {
-      console.log('fetchTruckListings error', error);
+      setLoading(false);
+      console.log('fetchTruckListings error', error?.response?.data || error);
+    }
+  };
+
+  const getDriversProfile = async driverId => {
+    try {
+      const response = await axiosInstance({
+        url: `api/profile/driverprofiles/${driverId}`,
+        method: 'GET',
+      });
+      console.log('getDriversProfile res', response?.data);
+      return response?.data;
+    } catch (error) {
+      console.error(
+        `getDriversProfile error for driverId ${driverId}:`,
+        error?.response,
+      );
+
+      return null;
+    }
+  };
+
+  const getTruckOwnerProfile = async truckOwnerId => {
+    console.log('truckOwnerId', truckOwnerId);
+    try {
+      const response = await axiosInstance({
+        url: `api/profile/truckprofiles/${truckOwnerId}`,
+        method: 'GET',
+      });
+      console.log('getTruckOwnerProfile res', response?.data);
+      return response?.data;
+    } catch (error) {
+      console.error(
+        `getTruckOwnerProfile error for truckOwnerId ${truckOwnerId}:`,
+        error?.response,
+      );
+
+      return null;
     }
   };
 
@@ -167,7 +232,7 @@ const HomeScreen = ({navigation}) => {
             {greeting}, {userProfle?.fullname}!
           </Text>
           <Text style={{fontSize: 22, color: 'white', fontWeight: '600'}}>
-            Want to Book a Truck ?
+            Want to Book a Vehicle ?
           </Text>
         </View>
       </View>
@@ -196,7 +261,9 @@ const HomeScreen = ({navigation}) => {
             justifyContent: 'space-between',
             marginBottom: 10,
           }}>
-          <Text style={{fontSize: 14, fontWeight: '600'}}>Popular Trucks</Text>
+          <Text style={{fontSize: 14, fontWeight: '600'}}>
+            Popular Vehicles
+          </Text>
           <Text
             style={{
               fontSize: 12,
@@ -206,7 +273,7 @@ const HomeScreen = ({navigation}) => {
             See More
           </Text>
         </View>
-        {reduxTruckListings?.map((cur, i) => (
+        {trucksWithDriversAssigned?.map((cur, i) => (
           <VtbTruckCard
             key={i}
             props={cur}

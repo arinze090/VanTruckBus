@@ -17,7 +17,9 @@ import {windowHeight, windowWidth} from '../../utils/Dimensions';
 import DetailsOption from '../../components/common/DetailsOption';
 import FixedBottomContainer from '../../components/common/FixedBottomContainer';
 import FormButton from '../../components/form/FormButton';
-import {formatPriceRange} from '../../Library/Common';
+import {formatPriceRange, formatToNaira} from '../../Library/Common';
+import {COLORS} from '../../themes/themes';
+import {truckExtraMessage} from '../../data/dummyData';
 
 const TruckDetailsScreen = ({route, navigation}) => {
   const item = route?.params;
@@ -43,7 +45,7 @@ const TruckDetailsScreen = ({route, navigation}) => {
     {
       icon: 'cube-outline',
       label: 'Load Capacity',
-      value: '10 Tons',
+      value: `${item?.capacity} tons`,
     },
     {
       icon: 'resize-outline',
@@ -53,7 +55,7 @@ const TruckDetailsScreen = ({route, navigation}) => {
     {
       icon: 'car-outline',
       label: 'Truck Type',
-      value: 'Flatbed',
+      value: item?.type,
     },
     {
       icon: 'speedometer-outline',
@@ -69,6 +71,11 @@ const TruckDetailsScreen = ({route, navigation}) => {
       icon: 'location-outline',
       label: 'GPS Tracking',
       value: 'Real-time',
+    },
+    {
+      icon: 'cash-outline',
+      label: 'Base Fare',
+      value: `${formatToNaira(item?.price?.[0])}/km`,
     },
   ];
 
@@ -94,6 +101,7 @@ const TruckDetailsScreen = ({route, navigation}) => {
   };
 
   const BookTruck = async () => {
+    console.log('ddjdj');
     if (userProfle) {
       navigation.navigate('TruckBooking', selectedItem);
     } else {
@@ -103,6 +111,7 @@ const TruckDetailsScreen = ({route, navigation}) => {
       });
     }
   };
+
   return (
     <SafeAreaViewComponent>
       <HeaderTitle
@@ -179,20 +188,30 @@ const TruckDetailsScreen = ({route, navigation}) => {
           <View style={styles.ownerSection}>
             <View style={styles.ownerInfo}>
               <Image
-                source={{uri: 'https://via.placeholder.com/50'}}
+                source={{uri: item?.matchedDriverProfile?.profilePicture}}
                 style={styles.ownerAvatar}
               />
               <View style={styles.ownerDetails}>
-                <Text style={styles.ownerName}>Hela Quintin</Text>
+                <Text style={styles.ownerName}>
+                  {item?.matchedDriverProfile?.fullName}
+                </Text>
                 <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
               </View>
             </View>
             <View style={styles.contactButtons}>
               <TouchableOpacity style={styles.contactButton}>
-                <Ionicons name="call-outline" size={20} color="#007AFF" />
+                <Ionicons
+                  name="call-outline"
+                  size={20}
+                  color={COLORS.vtbBtnColor}
+                />
               </TouchableOpacity>
               <TouchableOpacity style={styles.contactButton}>
-                <Ionicons name="chatbubble-outline" size={20} color="#007AFF" />
+                <Ionicons
+                  name="chatbubble-outline"
+                  size={20}
+                  color={COLORS.vtbBtnColor}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -247,22 +266,12 @@ const TruckDetailsScreen = ({route, navigation}) => {
           {/* Extras Section */}
           <View style={styles.extrasSection}>
             <Text style={styles.sectionTitle}>Extras</Text>
-            <Text style={styles.extrasText}>
-              Every vehicle booked through our platform comes with a dedicated
-              driver and a trained assistant (also known as a load carrier).
-              These personnel are assigned to ensure the safe handling, swift
-              loading, and timely delivery of your goods. The driver manages the
-              transportation logistics, while the assistant provides hands-on
-              support with lifting, organizing, and unloading items at your
-              delivery destination — helping to guarantee a smooth and
-              stress-free delivery experience for both inter- and intra-state
-              bookings.
-            </Text>
+            <Text style={styles.extrasText}>{truckExtraMessage}</Text>
           </View>
         </View>
       </ScrollView>
 
-      <FixedBottomContainer top={1.14}>
+      <FixedBottomContainer top={1.17}>
         <FormButton
           title={'Book Now'}
           width={1.1}
@@ -270,9 +279,6 @@ const TruckDetailsScreen = ({route, navigation}) => {
             BookTruck();
           }}
           marginBottom={0}
-          //   disabled={!email || !password || loading}
-          //   formError={formError}
-          //   loading={loading}
         />
       </FixedBottomContainer>
     </SafeAreaViewComponent>

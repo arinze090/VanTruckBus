@@ -10,13 +10,13 @@ import ScrollViewSpace from '../components/common/ScrollViewSpace';
 const NotificationsScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
 
-  const [notifications, setNotifications] = useState();
+  const [notifications, setNotifications] = useState([]);
 
   const fetchNotifications = async () => {
     setLoading(true);
     try {
       await axiosInstance({
-        url: 'notifications',
+        url: 'api/notification',
         method: 'GET',
       })
         .then(res => {
@@ -26,11 +26,11 @@ const NotificationsScreen = ({navigation}) => {
           setNotifications(res?.data?.data?.notifications);
         })
         .catch(err => {
-          console.log('fetchNotifications err', err);
+          console.log('fetchNotifications err', err?.response);
           setLoading(false);
         });
     } catch (error) {
-      console.log('fetchNotifications error', error);
+      console.log('fetchNotifications error', error?.response);
     }
   };
 
@@ -60,10 +60,14 @@ const NotificationsScreen = ({navigation}) => {
           <Text style={styles.loadingText}>
             Please wait while we fetch your data
           </Text>
-        ) : (
+        ) : notifications?.length ? (
           notifications?.map((cur, i) => (
             <NotificationsCard key={i} props={cur} />
           ))
+        ) : (
+          <Text style={styles.loadingText}>
+            You currently have no notification at the moment
+          </Text>
         )}
 
         <ScrollViewSpace />

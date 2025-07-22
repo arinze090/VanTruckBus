@@ -6,7 +6,9 @@ const DetailsOption2 = ({label, value}) => {
   return (
     <View style={styles.Q}>
       <Text style={styles.summaryQ}>{label}</Text>
-      <Text style={styles.summaryA}>{value || 'N/A'}</Text>
+      <Text numberOfLines={3} ellipsizeMode="tail" style={styles.summaryA}>
+        {value || 'N/A'}
+      </Text>
     </View>
   );
 };
@@ -18,8 +20,7 @@ const styles = StyleSheet.create({
     color: '#333',
     // fontWeight: '500',
     fontSize: 14,
-    // backgroundColor: 'red',
-    // width: windowWidth / 1.3,
+    // backgroundColor: 'blue',
   },
   summaryQ1: {
     color: '#ccc',
@@ -32,6 +33,9 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: '500',
     fontSize: 16,
+    flexWrap: 'wrap',
+    width: '100%',
+    // backgroundColor: 'green',
   },
   summaryQ2: {
     color: '#fff',
@@ -44,12 +48,13 @@ const styles = StyleSheet.create({
   },
   Q: {
     justifyContent: 'space-between',
-    height: windowHeight / 15,
     // alignContent: 'center',
     // alignItems: 'center',
     borderBottomColor: '#ccc',
     borderBottomWidth: 1,
     padding: 10,
+    flexDirection: 'column',
+    height: 'auto',
   },
   breaker: {
     borderBottomColor: '#333',

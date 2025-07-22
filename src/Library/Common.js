@@ -323,6 +323,13 @@ export const formatToNaira = number => {
   }).format(numeric);
 };
 
+export const parseNairaToNumber = value => {
+  if (!value) {
+    return 0;
+  }
+  return Number(value.replace(/[^0-9.-]+/g, ''));
+};
+
 export const formatDistance = meters => {
   if (meters < 1000) {
     return `${Math.round(meters)} m`;
@@ -369,4 +376,42 @@ export const metersToKilometers = meters => {
     return '0 km';
   }
   return `${(meters / 1000).toFixed(2)}`;
+};
+
+export const getCityAndCountry = async (
+  lat,
+  lng,
+  GOOGLE_MAPS_PLACES_API_KEY,
+) => {
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_PLACES_API_KEY}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.status !== 'OK') {
+      console.error('Geocoding failed', data);
+      return null;
+    }
+
+    const components = data.results[0].address_components;
+    console.log('components', components);
+
+    const city = components.find(
+      c =>
+        c.types.includes('locality') ||
+        c.types.includes('administrative_area_level_1'),
+    )?.long_name;
+
+    const country = components.find(c =>
+      c.types.includes('country'),
+    )?.long_name;
+
+    console.log('getCityAndCountry', city, country);
+
+    return {city, country};
+  } catch (err) {
+    console.error('Geocode error:', err);
+    return null;
+  }
 };

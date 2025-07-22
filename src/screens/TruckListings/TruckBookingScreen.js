@@ -33,6 +33,7 @@ import {
   metersToKilometers,
   RNToast,
   formatToNaira,
+  getCityAndCountry,
 } from '../../Library/Common';
 import {COLORS} from '../../themes/themes';
 import {availableTimesForAppointmentDaily} from '../../data/dummyData';
@@ -71,7 +72,8 @@ const TruckBookingScreen = ({route, navigation}) => {
 
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
-  const [deliveryCity, setDeliveryCity] = useState(''); 
+  const [deliveryData, setDeliveryData] = useState('');
+  const [pickupData, setPickupData] = useState('');
   const [description, setDescription] = useState('');
 
   // Error states
@@ -79,7 +81,6 @@ const TruckBookingScreen = ({route, navigation}) => {
   const [pickupTimeError, setPickupTimeError] = useState();
   const [priceError, setPriceError] = useState('');
   const [descriptionError, setDescriptionError] = useState('');
-
 
   // geolocation states
   const [query, setQuery] = useState('');
@@ -154,6 +155,23 @@ const TruckBookingScreen = ({route, navigation}) => {
       const duration = data?.routes[0]?.legs[0]?.duration?.value;
       const distance = data?.routes[0]?.legs[0]?.distance?.value;
 
+      // Get city and country
+      const originLocation = await getCityAndCountry(
+        origin.lat,
+        origin.lng,
+        GOOGLE_MAPS_PLACES_API_KEY,
+      );
+      const destinationLocation = await getCityAndCountry(
+        destination?.lat,
+        destination?.lng,
+        GOOGLE_MAPS_PLACES_API_KEY,
+      );
+
+      console.log('Origin City/Country:', originLocation);
+      console.log('Destination City/Country:', destinationLocation);
+
+      setPickupData(originLocation);
+      setDeliveryData(destinationLocation);
       setRouteCoords(decoded);
       setRouteInfo({duration, distance});
 
@@ -186,23 +204,23 @@ const TruckBookingScreen = ({route, navigation}) => {
         time: pickupTime,
       },
       description: description,
-      price: parseInt(price),
+      price: overallPrice,
       pickupLocation: {
         address: pickupCoords?.address?.label,
-        city: city,
-        country: country,
+        city: pickupData?.city,
+        country: pickupData?.country,
       },
       deliveryLocation: {
         address: dropOffCoords?.address?.label,
-        city: deliveryCity,
-        country: country,
+        city: deliveryData?.city,
+        country: deliveryData?.country,
       },
 
       status: 'request',
       reminders: [15, 60],
       negotiation: {
         proposedBy: 'user',
-        userOffer: price,
+        userOffer: overallPrice,
         status: 'proposed',
       },
     };
@@ -213,8 +231,8 @@ const TruckBookingScreen = ({route, navigation}) => {
       setFormError('Please select a date for your booking');
     } else if (!pickupTime) {
       setPickupTimeError('please select a time for your delivery');
-    } else if (!price) {
-      setPriceError('Please provide your bargain price');
+    } else if (!overallPrice) {
+      setPriceError('Please provide your locations to generate estimated fee');
     } else if (!description) {
       setDescriptionError('Please provide a brief description');
     } else {
@@ -232,7 +250,7 @@ const TruckBookingScreen = ({route, navigation}) => {
     if (routeInfo) {
       const durationInKm = metersToKilometers(routeInfo?.distance);
       const truckBasefare = item?.price?.[0];
-      const overallPrice = durationInKm * truckBasefare;
+      const overallPricee = durationInKm * truckBasefare;
       console.log(
         'overallPrice',
         overallPrice,
@@ -240,7 +258,7 @@ const TruckBookingScreen = ({route, navigation}) => {
         durationInKm,
         routeInfo,
       );
-      setOverallPrice(formatToNaira(overallPrice?.toString()));
+      setOverallPrice(formatToNaira(overallPricee?.toString()));
       setPrice(overallPrice);
     }
   }, [routeInfo]);
@@ -356,7 +374,7 @@ const TruckBookingScreen = ({route, navigation}) => {
             />
 
             <FormInput
-              formInputTitle={'Price (naira)'}
+              formInputTitle={'Estimated Price (naira)'}
               keyboardType={'number-pad'}
               placeholder="Enter your your price"
               value={overallPrice}

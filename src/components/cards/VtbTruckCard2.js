@@ -8,7 +8,7 @@ import AvailabilityCard from './AvailabilityCard';
 import {formatPriceRange, setPriceTo2DecimalPlaces} from '../../Library/Common';
 
 const VtbTruckCard2 = ({props, onPress, price}) => {
-  console.log('ppp', props);
+  console.log('ppp', props, price);
   return (
     <TouchableOpacity
       activeOpacity={0.9}
@@ -28,7 +28,7 @@ const VtbTruckCard2 = ({props, onPress, price}) => {
               style={{marginRight: 7}}
             />
             <Text style={styles.truckName}>
-              {setPriceTo2DecimalPlaces(price)}
+              {price}
             </Text>
           </View>
         </View>

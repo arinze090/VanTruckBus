@@ -269,7 +269,7 @@ const LoginScreen = ({navigation, route}) => {
             <TouchableOpacity
               style={styles.signup}
               onPress={() => {
-                dispatch(setUserDestination('Registration'));
+                dispatch(setUserDestination('Login'));
                 navigation.navigate('Register');
               }}>
               <Text
