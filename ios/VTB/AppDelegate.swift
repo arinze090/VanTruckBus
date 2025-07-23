@@ -3,6 +3,7 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import GoogleMaps
+import Firebase
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,6 +16,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+
+    // firebase congif
+    FirebaseApp.configure()
 
    // Get API key from Info.plist for better security
     // guard let apiKey = Bundle.main.infoDictionary?["AIzaSyDZpLMKhwoa0H5EnhFWjnNVuafQw0KHDDk"] as? String else {

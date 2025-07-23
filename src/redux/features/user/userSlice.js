@@ -20,6 +20,9 @@ const initialState = {
   truckListings: null,
   bookedTrucks: null,
   userLocationCoordinates: null,
+
+  // firebase token
+  fcmToken: null,
 };
 
 const userSlice = createSlice({
@@ -129,6 +132,9 @@ const userSlice = createSlice({
     saveUserLocationCoordinates: (state, action) => {
       state.userLocationCoordinates = action.payload;
     },
+    setFcmToken: (state, action) => {
+      state.fcmToken = action.payload;
+    },
   },
 });
 
@@ -161,5 +167,8 @@ export const {
   removeProductFromWishlist,
 
   updateWeeklyAvailability,
+
+  // fcmtokn
+  setFcmToken,
 } = userSlice.actions;
 export default userSlice.reducer;
